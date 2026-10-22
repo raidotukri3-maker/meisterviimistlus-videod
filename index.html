@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Карта роликов MV-C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: a screening board. Header with the run sheet, sticky section bar, then films as 9:16 "phones" in a grid;
+     the paper film and the balcony reserve get a wide feature row, the carousel scrolls sideways. */
+  :root {
+    --bg: #e8edeb;          /* bathroom tile grey, green bias */
+    --surface: #f6f8f7;
+    --ink: #1b2434;         /* the films' navy */
+    --muted: #586371;
+    --line: #cdd6d3;
+    --accent: #9c6a10;      /* mustard, darkened for text */
+    --accent-fill: #e2a64b; /* the films' mustard */
+    --on-accent: #1b2434;
+    --tile: #2c6a64;
+    --screen: #0e1218;
+    --font-display: "Rubik", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10151c; --surface: #18202a; --ink: #e6ebef; --muted: #9ba7b2; --line: #2a3541;
+      --accent: #e8b45c; --accent-fill: #e2a64b; --on-accent: #141a24; --tile: #74b5ad; --screen: #06080b;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10151c; --surface: #18202a; --ink: #e6ebef; --muted: #9ba7b2; --line: #2a3541;
+    --accent: #e8b45c; --accent-fill: #e2a64b; --on-accent: #141a24; --tile: #74b5ad; --screen: #06080b;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; padding-block: 28px 48px; }
+
+  /* header */
+  header { display: grid; gap: 14px; }
+  .brand { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tile); }
+  h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3rem); line-height: 1.05; text-wrap: balance; }
+  .lede { margin: 0; max-width: 62ch; color: var(--muted); font-size: 1.02rem; }
+  .runsheet { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--line); font-size: 0.92rem; }
+  .runsheet div { display: flex; gap: 6px; align-items: baseline; }
+  .runsheet dt { color: var(--muted); }
+  .runsheet dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* section bar */
+  nav.bar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px));
+    background: var(--bg); border-bottom: 1px solid var(--line);
+  }
+  nav.bar ul { list-style: none; margin: 0 auto; padding: 0; max-width: 1180px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  nav.bar a {
+    display: inline-block; white-space: nowrap; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
+    color: var(--ink); text-decoration: none; font-size: 0.9rem; background: var(--surface);
+  }
+  nav.bar a:hover { border-color: var(--tile); }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--accent-fill); outline-offset: 2px; }
+
+  section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+  .sec-head { display: grid; gap: 4px; }
+  h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.45rem; text-wrap: balance; }
+  .sec-head p { margin: 0; color: var(--muted); max-width: 70ch; }
+
+  /* film cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 236px), 1fr)); gap: 26px 20px; align-items: start; }
+  .film { display: grid; gap: 10px; min-width: 0; }
+  .screen {
+    position: relative; aspect-ratio: var(--ar, 9 / 16); max-width: 100%; width: 100%;
+    background: var(--screen); border-radius: 14px; overflow: hidden;
+    box-shadow: 0 1px 0 var(--line), 0 10px 26px rgba(10, 20, 30, 0.18);
+  }
+  .screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--screen); }
+  .idline { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .idline b { color: var(--tile); font-weight: 500; letter-spacing: 0.04em; }
+  .film h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.12rem; line-height: 1.2; text-wrap: balance; }
+  .film p { margin: 0; font-size: 0.93rem; }
+  .meta { margin: 0; display: grid; gap: 2px; font-size: 0.84rem; color: var(--muted); }
+  .meta div { display: flex; gap: 6px; }
+  .meta dt { flex: none; }
+  .meta dd { margin: 0; color: var(--ink); min-width: 0; }
+  .flag-note { font-size: 0.84rem; color: var(--accent); font-weight: 500; }
+
+  /* variant switch */
+  .variants { display: flex; flex-wrap: wrap; gap: 6px; }
+  .variants button {
+    font: inherit; font-size: 0.86rem; min-height: 34px; padding: 5px 11px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .variants button[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); font-weight: 600; }
+  .variant-note { font-size: 0.84rem; color: var(--muted); min-height: 1.3em; }
+
+  /* feature rows */
+  .feature { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .feature .film { gap: 10px; }
+  .feature .side { display: grid; gap: 14px; min-width: 0; align-content: start; }
+  .feature .side h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; line-height: 1.15; }
+  .feature .side p { margin: 0; max-width: 62ch; }
+  .live {
+    justify-self: start; display: inline-flex; gap: 8px; align-items: center; padding: 9px 14px; border-radius: 10px;
+    background: var(--ink); color: var(--bg); text-decoration: none; font-weight: 600; font-size: 0.93rem;
+  }
+  @media (max-width: 720px) { .feature { grid-template-columns: minmax(0, 1fr); } .feature .film { max-width: 360px; } }
+
+  /* captions */
+  details { border-top: 1px solid var(--line); padding-top: 8px; }
+  summary { cursor: pointer; font-size: 0.86rem; color: var(--tile); font-weight: 500; }
+  .cap { display: grid; gap: 8px; padding-top: 8px; }
+  .cap blockquote { margin: 0; padding: 10px 12px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); font-size: 0.88rem; white-space: pre-line; overflow-wrap: anywhere; }
+  .cap button { justify-self: start; font: inherit; font-size: 0.82rem; padding: 4px 10px; border-radius: 7px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+  .cap small { color: var(--muted); font-size: 0.8rem; }
+
+  /* carousel */
+  .strip { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+  .strip figure { flex: none; width: min(78vw, 300px); margin: 0; scroll-snap-align: start; display: grid; gap: 6px; }
+  .strip img { width: 100%; height: auto; aspect-ratio: 4 / 5; max-width: 100%; border-radius: 10px; display: block; background: var(--screen); box-shadow: 0 1px 0 var(--line); }
+  .strip figcaption { font-size: 0.84rem; color: var(--muted); }
+  .strip figcaption b { font-family: var(--font-mono); font-weight: 500; color: var(--tile); margin-right: 6px; }
+
+  /* decisions */
+  .asks { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: ask; }
+  .asks li { counter-increment: ask; display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 10px; padding: 12px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
+  .asks li::before { content: counter(ask); font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; color: var(--accent); }
+  .asks b { font-weight: 600; }
+  .asks span { color: var(--muted); }
+
+  footer { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 0.86rem; display: grid; gap: 6px; max-width: 80ch; }
+  footer p { margin: 0; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  html { scroll-behavior: smooth; }
+</style>
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="brand">Meisterviimistlus · vannitoa remont · Tallinn ja Harjumaa</div>
+    <h1>Карта роликов MV-C</h1>
+    <p class="lede">Все ролики очереди MV-C на одной странице: бумажный мультик и фильмы из ваших настоящих фото и видео. Нажмите на кадр, чтобы посмотреть со звуком. Ролики ещё не запущены в рекламу.</p>
+    <dl class="runsheet">
+      <div><dt>Роликов</dt><dd>8</dd></div>
+      <div><dt>Общая длина</dt><dd>1 мин 38 с</dd></div>
+      <div><dt>Формат</dt><dd>9:16, 1080×1920</dd></div>
+      <div><dt>Карусель</dt><dd>5 карточек 4:5</dd></div>
+      <div><dt>Статус</dt><dd>ждёт вашего просмотра</dd></div>
+    </dl>
+  </header>
+
+  <nav class="bar" aria-label="Разделы">
+    <ul>
+      <li><a href="#paper">Мультик</a></li>
+      <li><a href="#real">Настоящие съёмки</a></li>
+      <li><a href="#short">Короткие версии</a></li>
+      <li><a href="#carousel">Карусель</a></li>
+      <li><a href="#balcony">Балкон</a></li>
+      <li><a href="#decisions">Ваши решения</a></li>
+    </ul>
+  </nav>
+
+  <!-- MV-C00 -->
+  <section id="paper">
+    <div class="sec-head">
+      <h2>Бумажный мультик</h2>
+      <p>Одобренная проба стиля с новой музыкой. Эстонского немного: окно со Старым Таллином на фоне и «Tallinn ja Harjumaa» на карточке.</p>
+    </div>
+    <div class="feature">
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C00.jpg" src="media/MV-C00_paper_bathroom_9x16.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C00</b><span>12,0 с · 12 поз/с</span></div>
+      </article>
+      <div class="side">
+        <h3>«Tuttav vannituba?»</h3>
+        <p>Старая ванная, плесень под плиткой, бумажный рулон открывает новую комнату, человечек машет на прощание. В финале телефон и сайт.</p>
+        <div class="variants" role="group" aria-label="Вариант мультика" data-for="0">
+          <button type="button" aria-pressed="true" data-src="media/MV-C00_paper_bathroom_9x16.mp4" data-poster="media/posters/C00.jpg" data-note="Музыка B: гитара, маримба и смешной фагот. Стоит по умолчанию.">Музыка B</button>
+          <button type="button" aria-pressed="false" data-src="media/MV-C00_paper_bathroom_9x16_music-A2.mp4" data-poster="media/posters/C00.jpg" data-note="Музыка A: мелодия на флейте, электропиано и маримба. Картинка та же.">Музыка A</button>
+          <button type="button" aria-pressed="false" data-src="media/MV-C00_paper_bathroom_9x16_MESSENGER-AD.mp4" data-poster="media/posters/C00_msg_end.jpg" data-note="Рекламный вариант: в финале «Saada foto + asukoht Messengeris.» вместо телефона и сайта. Музыка B.">Финал с Messenger</button>
+        </div>
+        <div class="variant-note" aria-live="polite">Музыка B: гитара, маримба и смешной фагот. Стоит по умолчанию.</div>
+        <dl class="meta">
+          <div><dt>Музыка:</dt><dd>оригинальная, два варианта на выбор</dd></div>
+          <div><dt>Картинка:</dt><dd>бумага в JavaScript, без фотографий</dd></div>
+        </dl>
+        <a class="live" href="https://claude.ai/artifact/VYxwj9D7XQfsnB4jSSLNjp" target="_blank" rel="noopener">Живая версия с переключателем музыки ↗</a>
+        <small style="color:var(--muted);font-size:0.8rem">Живая версия открывается только под аккаунтом Claude, в котором её сделали.</small>
+        <details>
+          <summary>Подпись к посту (эстонский черновик)</summary>
+          <div class="cap">
+            <blockquote>Tuttav vannituba? Vahel peitub plaatide all rohkem, kui esmapilgul paistab.
+Meisterviimistlus – vannitoa remont Tallinnas ja Harjumaal.
++372 5620 8888 · vannitoaremont.eu</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- MV-C01 .. C04 -->
+  <section id="real">
+    <div class="sec-head">
+      <h2>Настоящие съёмки</h2>
+      <p>Ваши фото и видео без ускорения и стабилизации, только мягкая тёплая цветокоррекция. В финале каждого: «Saada foto + asukoht Messengeris.», флажок и «Tallinn ja Harjumaa».</p>
+    </div>
+    <div class="grid">
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C01.jpg" src="media/MV-C01_floor_9x16_web.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C01</b><span>16,8 с</span></div>
+        <h3>«See töö jääb plaadi alla.»</h3>
+        <p>Подготовка пола: смесь заливают и разравнивают по нагревательному мату. Это не гидроизоляция, и в ролике так не сказано.</p>
+        <div class="variants" role="group" aria-label="Формат C01">
+          <button type="button" aria-pressed="true" data-src="media/MV-C01_floor_9x16_web.mp4" data-poster="media/posters/C01.jpg" data-ar="9 / 16">9:16</button>
+          <button type="button" aria-pressed="false" data-src="media/MV-C01_floor_4x5_web.mp4" data-poster="media/posters/C01_4x5.jpg" data-ar="4 / 5">4:5</button>
+        </div>
+        <dl class="meta">
+          <div><dt>Источники:</dt><dd>видео V02, V03</dd></div>
+          <div><dt>На странице:</dt><dd>веб-копия, оригинал в ZIP</dd></div>
+        </dl>
+        <details>
+          <summary>Подпись к посту</summary>
+          <div class="cap">
+            <blockquote>See töö jääb hiljem plaadi alla, aga just siit algab korralik põrand.
+Kaadrid meie tööst: põrandaküttematt kaetakse seguga ja pind silutakse enne plaatimist.
+Tallinn ja Harjumaa. Plaanid vannitoa remonti? Saada foto + asukoht Messengeris.</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </article>
+
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C02.jpg" src="media/MV-C02_room_9x16.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C02</b><span>15,6 с</span></div>
+        <h3>«Läbimõeldud igapäevaks.»</h3>
+        <p>Готовая ванная: стиральная машина под столешницей, душ и подсвеченная ниша. Отражения людей в зеркалах обрезаны.</p>
+        <dl class="meta">
+          <div><dt>Источники:</dt><dd>фото P24, P18, P22, P16</dd></div>
+        </dl>
+        <details>
+          <summary>Подпись к посту</summary>
+          <div class="cap">
+            <blockquote>Läbimõeldud igapäevaks: pesumasin valamu tööpinna all, dušinurk ja valgustatud seinanišš.
+Näide meie tehtud vannitoast.
+Tallinn ja Harjumaa. Saada foto + asukoht Messengeris – vaatame koos, mis sinu ruumi sobib.</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </article>
+
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C03.jpg" src="media/MV-C03_start_9x16.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C03</b><span>14,4 с</span></div>
+        <h3>«Nii algab uuendus.»</h3>
+        <p>Начало ремонта старой ванной с цветочной плиткой. Ролик кончается на демонтаже: готовый результат этой ванной не показан.</p>
+        <dl class="meta">
+          <div><dt>Источники:</dt><dd>фото T141, T157, видео IMG_1587, IMG_1582</dd></div>
+        </dl>
+        <div class="flag-note">Нужно согласие рабочего, который в кадре.</div>
+        <details>
+          <summary>Подпись к посту</summary>
+          <div class="cap">
+            <blockquote>Nii algab uuendus: vana viimistlus eemaldatakse, et uus viimistlus saaks korraliku aluspinna.
+Kaadrid töö käigust. Tallinn ja Harjumaa. Saada foto + asukoht Messengeris.</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </article>
+
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C04.jpg" src="media/MV-C04_hybrid_9x16.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C04</b><span>12,0 с</span></div>
+        <h3>«Idee / Päris töö»</h3>
+        <p>Готовая бумажная комната как идея, рваный бумажный переход, настоящая работа и пример готовой ванной. Без «до/после».</p>
+        <dl class="meta">
+          <div><dt>Источники:</dt><dd>кадры мультика MV-C00, видео V03, фото P24</dd></div>
+          <div><dt>Музыка:</dt><dd>из MV-C01, точная склейка</dd></div>
+        </dl>
+        <details>
+          <summary>Подпись к посту</summary>
+          <div class="cap">
+            <blockquote>Paberanimatsioon näitab ideed, kaadrid näitavad päris tööd. Lõpus näide meie tehtud vannitoast.
+Saada foto + asukoht Messengeris.</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </article>
+    </div>
+  </section>
+
+  <!-- MV-C05a / C05b -->
+  <section id="short">
+    <div class="sec-head">
+      <h2>Короткие версии</h2>
+      <p>По 7,8 секунды, для рекламы, где нужен быстрый ролик.</p>
+    </div>
+    <div class="grid">
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C05a.jpg" src="media/MV-C05a_floor_short_9x16.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C05a</b><span>7,8 с</span></div>
+        <h3>«See töö jääb plaadi alla.»</h3>
+        <p>Короткая версия MV-C01: заливка и разравнивание пола.</p>
+        <dl class="meta"><div><dt>Источники:</dt><dd>видео V02</dd></div></dl>
+        <details>
+          <summary>Подпись к посту</summary>
+          <div class="cap">
+            <blockquote>See töö jääb hiljem plaadi alla. Kaadrid meie tööst: põranda ettevalmistus enne plaatimist.
+Saada foto + asukoht Messengeris.</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </article>
+
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C05b.jpg" src="media/MV-C05b_room_short_9x16.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C05b</b><span>7,8 с</span></div>
+        <h3>«Läbimõeldud igapäevaks.»</h3>
+        <p>Короткая версия MV-C02. В подписи к посту оставьте «Näide meie tehtud vannitoast»: в самом ролике этой пометки нет.</p>
+        <dl class="meta"><div><dt>Источники:</dt><dd>фото P24, P22</dd></div></dl>
+        <details>
+          <summary>Подпись к посту</summary>
+          <div class="cap">
+            <blockquote>Läbimõeldud igapäevaks: dušinurk ja valgustatud seinanišš. Näide meie tehtud vannitoast.
+Saada foto + asukoht Messengeris.</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </article>
+    </div>
+  </section>
+
+  <!-- MV-C06 -->
+  <section id="carousel">
+    <div class="sec-head">
+      <h2>Карусель «Milline lahendus sobib sinu ruumi?»</h2>
+      <p>MV-C06: пять карточек 1080×1350, три разные комнаты, без цен. Листайте вбок. Фото P04, P02, P01; на P02 обрезано зеркало, в котором отражалась рука фотографа.</p>
+    </div>
+    <div class="strip" tabindex="0" aria-label="Карточки карусели, листаются вбок">
+      <figure><img loading="lazy" src="media/cards/MV-C06_card1.jpg" alt="Карточка 1: «Milline lahendus sobib sinu ruumi?» над тремя фото разных комнат" width="1080" height="1350"><figcaption><b>1</b>Вопрос и три комнаты</figcaption></figure>
+      <figure><img loading="lazy" src="media/cards/MV-C06_card2.jpg" alt="Карточка 2: компактная душевая" width="1080" height="1350"><figcaption><b>2</b>Kompaktne duširuum</figcaption></figure>
+      <figure><img loading="lazy" src="media/cards/MV-C06_card3.jpg" alt="Карточка 3: душ и стиральная машина" width="1080" height="1350"><figcaption><b>3</b>Dušinurk ja pesumasin</figcaption></figure>
+      <figure><img loading="lazy" src="media/cards/MV-C06_card4.jpg" alt="Карточка 4: ванная комната с ванной" width="1080" height="1350"><figcaption><b>4</b>Vanniga vannituba</figcaption></figure>
+      <figure><img loading="lazy" src="media/cards/MV-C06_card5.jpg" alt="Карточка 5: финал с призывом написать в Messenger" width="1080" height="1350"><figcaption><b>5</b>Финал и Messenger</figcaption></figure>
+    </div>
+    <details>
+      <summary>Подпись к посту</summary>
+      <div class="cap">
+        <blockquote>Milline lahendus sobib sinu ruumi? Kompaktne duširuum, dušinurk koos pesumasinaga või vanniga vannituba – kolm näidet meie tehtud töödest.
+Saada foto + asukoht Messengeris, vaatame koos.</blockquote>
+        <button type="button" data-copy>Копировать</button>
+      </div>
+    </details>
+  </section>
+
+  <!-- MV-C07 -->
+  <section id="balcony">
+    <div class="sec-head">
+      <h2>Резерв: балкон</h2>
+      <p>Отдельная услуга. Подписан как пример прошлой работы, без дат, гарантий, площади и цен.</p>
+    </div>
+    <div class="feature">
+      <article class="film" data-film>
+        <div class="screen">
+          <video controls playsinline preload="none" poster="media/posters/C07.jpg" src="media/MV-C07_balcony_9x16.mp4"></video>
+        </div>
+        <div class="idline"><b>MV-C07</b><span>12,0 с</span></div>
+      </article>
+      <div class="side">
+        <h3>«Rõdu uuendus algab aluspinnast.»</h3>
+        <p>Три шага по фото случая Tuve 30: открытое основание, механическая подготовка плиты балкона, готовый пол.</p>
+        <dl class="meta">
+          <div><dt>Источники:</dt><dd>фото 12-02, 20-04, original-04</dd></div>
+        </dl>
+        <div class="flag-note">Нужно согласие рабочего на фото шага 2.</div>
+        <details>
+          <summary>Подпись к посту</summary>
+          <div class="cap">
+            <blockquote>Rõdu uuendus algab aluspinnast: vana kate eemaldatakse, rõduplaat valmistatakse mehaaniliselt ette ja alles siis tuleb uus põrand.
+Näide meie varasemast tööst. Saada foto + asukoht Messengeris.</blockquote>
+            <button type="button" data-copy>Копировать</button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="decisions">
+    <div class="sec-head">
+      <h2>Что нужно от вас</h2>
+      <p>Без этих ответов ролики можно смотреть, но запускать в рекламу рано.</p>
+    </div>
+    <ol class="asks">
+      <li><div><b>Музыка для мультика.</b> <span>B (гитара и фагот) или A (флейта). Переключатель в разделе «Мультик».</span></div></li>
+      <li><div><b>Васильки и полотенце с полосками в мультике.</b> <span>Оставить или убрать.</span></div></li>
+      <li><div><b>Флажок на финальных карточках роликов из съёмок.</b> <span>Оставить или убрать, как в мультике.</span></div></li>
+      <li><div><b>Эстонские тексты.</b> <span>Дать прочитать носителю языка: надписи в роликах и подписи к постам.</span></div></li>
+      <li><div><b>Согласия.</b> <span>Фото комнат — ваши работы, и клиенты согласны на рекламу; рабочий из MV-C03 и MV-C07 согласен появиться в ролике.</span></div></li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Полные файлы, версии без музыки и исходники лежат в ZIP-архивах из чата. Два ролика MV-C01 здесь в веб-копии, чтобы страница открывалась быстрее; на глаз они не отличаются от оригиналов. Страница закрыта от поисковиков, но открывается у всех, у кого есть ссылка.</p>
+    <p>Музыка оригинальная, написана для этих роликов. Звук из исходных видео не использован.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const videos = Array.from(document.querySelectorAll('video'));
+  // one film at a time
+  videos.forEach((v) => v.addEventListener('play', () => videos.forEach((o) => { if (o !== v && !o.paused) o.pause(); })));
+
+  // variant switches: swap the film in the same card; every variant has the same length, so keep the playhead
+  document.querySelectorAll('.variants').forEach((group) => {
+    const host = group.closest('.feature') || group.closest('.film');
+    const video = host.querySelector('video'), screen = host.querySelector('.screen');
+    const note = host.querySelector('.variant-note');
+    const buttons = Array.from(group.querySelectorAll('button'));
+    buttons.forEach((b) => b.addEventListener('click', () => {
+      if (b.getAttribute('aria-pressed') === 'true') return;
+      const wasPlaying = !video.paused, t = video.currentTime;
+      buttons.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+      if (b.dataset.ar) screen.style.setProperty('--ar', b.dataset.ar);
+      video.poster = b.dataset.poster; video.src = b.dataset.src;
+      if (note && b.dataset.note) note.textContent = b.dataset.note;
+      if (wasPlaying || t > 0) {
+        video.addEventListener('loadedmetadata', () => {
+          try { video.currentTime = Math.min(t, video.duration || t); } catch (e) { /* stays at 0 */ }
+          if (wasPlaying) video.play().catch(() => {});
+        }, { once: true });
+        video.load();
+      }
+    }));
+  });
+
+  // copy a caption; fall back to selecting it
+  document.querySelectorAll('[data-copy]').forEach((btn) => btn.addEventListener('click', () => {
+    const q = btn.parentElement.querySelector('blockquote'), text = q.textContent.trim();
+    const done = () => { btn.textContent = 'Скопировано'; setTimeout(() => { btn.textContent = 'Копировать'; }, 1600); };
+    const select = () => { const r = document.createRange(); r.selectNodeContents(q); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Выделено, нажмите Ctrl+C'; };
+    try { navigator.clipboard.writeText(text).then(done, select); } catch (e) { select(); }
+  }));
+})();
+</script>
+
+</body>
+</html>
